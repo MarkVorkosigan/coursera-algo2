@@ -1,6 +1,8 @@
 """Traveling Sales man problem"""
 
 import itertools
+import gc
+gc.enable()
 
 Inf = 10000000
 def tsp_bruteforce(g):
@@ -40,7 +42,14 @@ def tsp_dp(g):
 
     mat = {}
     def get_set_hash(s):
-        return ','.join(sorted([str(i) for i in s]))
+        result = 0
+        for i in s:
+            result += 1 << i
+        return result 
+        #return ','.join(sorted([str(i) for i in s]))
+
+    def get_sub_set_size(S):
+        return len([s for s in bin(S) if s == '1'])
 
     # Init 1: cost 0 from start_node to start_node, with no other nodes
     mat[(get_set_hash({start_node}), start_node)] = 0
@@ -59,30 +68,25 @@ def tsp_dp(g):
         import datetime
         print '%s: sub problem size %s' % (datetime.datetime.now(), m)
         sub_set_cnt = 0
+        mat2 = {}
         for sub_set in itertools.combinations(other_nodes, m - 1):
 
             set_with_start = {start_node} | set(sub_set)
             # for each node (that is not start_node) in sub_set
             for j in sub_set:
                 # A[S', j] = min(A[S' - {j}, k] + Ckj for k in S' and k <> 1, j
-                mat[(get_set_hash(set_with_start), j)] = Inf
+                best_cost = Inf
                 sub_set_cnt += 1
                 for k in sub_set:
                     if k == j: continue
-                    old_cost= mat[(get_set_hash(set_with_start - {j}), k)]
+                    old_cost = mat[(get_set_hash(set_with_start - {j}), k)]
                     cost = old_cost + g[k][j]
-                    new_cost = mat[(get_set_hash(set_with_start), j)]
-                    if cost < new_cost:
-                        mat[(get_set_hash(set_with_start), j)] = cost
-        # clean up cached solution with size m - 1
-        size_before = len(mat)
-        for key in mat.keys():
-            cost = mat[key]
-            S, j = key
-            if len(S.split(',')) < m:
-                del mat[key]
-        size_after = len(mat)
-        print 'subset cnt: %s, mat size (before, after) cleaning: %s, %s' % (sub_set_cnt, size_before, size_after)
+                    if cost < best_cost:
+                        mat2[(get_set_hash(set_with_start), j)] = cost
+                        best_cost = cost
+        mat = mat2
+        print 'subset cnt: %s' % (sub_set_cnt)
+    gc.collect()
 
     # Find the min cost of A[S, j] + cost from j to start_node
     # where S is size n
@@ -90,7 +94,8 @@ def tsp_dp(g):
 
     for S, j in mat:
         cost = mat[(S, j)]
-        if len(S.split(',')) != len(g): continue
+        sub_set_size = get_sub_set_size(S)
+        if sub_set_size != len(g): continue
         new_cost = cost + g[j][start_node]
         if new_cost < result:
             result = new_cost
@@ -106,6 +111,7 @@ def tsp_dp_bkup(g):
             for j in S':
                A[S', j] = min(A[S' - {j}, k] + Ckj for k in S' and k <> 1, j
     """
+
     start_node = g.keys()[0]
     other_nodes = g.keys()[1:]
 
