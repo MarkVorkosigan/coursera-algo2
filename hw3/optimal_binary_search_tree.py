@@ -52,5 +52,14 @@ def main():
 
     optimal_bts(freq_tuples)
 
+    freq_tuples2= [(1, 0.2),
+                   (2, 0.05),
+                   (3, 0.17),
+                   (4, 0.1),
+                   (5, 0.2),
+                   (6, 0.03),
+                   (7, 0.25)]
+    optimal_bts(freq_tuples2)
+
 main()
         

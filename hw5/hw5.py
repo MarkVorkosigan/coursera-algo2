@@ -25,7 +25,7 @@ def main():
     g = read_input('tsp.txt')
     print 'solving...'
     print g
-    print tsp.tsp_dp(g)
+    print tsp.tsp_dp2(g)
 
 if __name__ == '__main__':
     main()

@@ -78,6 +78,12 @@ def main():
     print huffman(sample1)
     print huffman2(sample1)
 
+    print huffman(((0.28, 'A', ['']),
+                  (0.27, 'B', ['']),
+                  (0.2, 'C', ['']),
+                  (0.15, 'D', ['']),
+                  (0.1, 'E', [''])))
+
 def build_test_case():
     import random
     import itertools
@@ -117,7 +123,7 @@ def test():
 
 
 if __name__ == '__main__':
-    #main()
-    test()
+    main()
+    #test()
     
     
